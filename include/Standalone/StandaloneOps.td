@@ -11,6 +11,7 @@
 
 include "StandaloneDialect.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
+include "mlir/Interfaces/InferTypeOpInterface.td"
 
 def Standalone_FooOp : Standalone_Op<"foo", [NoSideEffect,
                                              SameOperandsAndResultType]> {
@@ -37,6 +38,14 @@ def Standalone_FooOp : Standalone_Op<"foo", [NoSideEffect,
     let assemblyFormat = [{
         $input attr-dict `:` type($input)
     }];
+}
+
+// Demonstrate error in Tablegen Type Inference
+def InferOp : Standalone_Op<"infer", [AllTypesMatch<["take", "result"]>]> {
+  let summary = "%result = standalone.infer %ignore, %take : i32";
+  let arguments = (ins I1:$ignore, AnyType:$take);
+  let results = (outs AnyType:$result);
+  let assemblyFormat = "$ignore `,` $take attr-dict `:` type($result)";
 }
 
 #endif // STANDALONE_OPS
